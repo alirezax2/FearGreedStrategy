@@ -65,3 +65,46 @@ yDF = yf.download(Ticker, start= startdate.strftime('%Y-%m-%d') , end = enddate.
 
 mergeDF=pd.merge(df , yDF ,  how='inner', left_index=True, right_index=True)
 
+
+
+import matplotlib.pyplot as plt
+plt.plot(mergeDF.Close)
+plt.plot(mergeDF.FEAR_GREED)
+plt.show()
+
+ax = mergeDF.Close.plot()
+ax2 =mergeDF.FEAR_GREED.plot(secondary_y=True)
+# ax2.set_ylim(-20, 50)
+fig = ax.get_figure()
+plt.show()
+
+
+####################################################################################
+
+fig,ax = plt.subplots()
+
+ax.plot(mergeDF.Close, color="green", marker="o")
+ax.set_xlabel("Date",fontsize=14)
+ax.set_ylabel("Close",color="red",fontsize=14)
+fig = ax.get_figure()
+ax2=ax.twinx()
+ax2.plot(mergeDF.FEAR_GREED,color="blue",marker="o")
+ax2.set_ylabel("FEAR_GREED",color="blue",fontsize=14)
+plt.show()
+
+
+####################################################################################
+#Seaborn Correlation
+
+import seaborn as sns
+
+mergeDF.reset_index(inplace=True)
+fig, ax = plt.subplots()
+ax2 = ax.twinx()
+sns.regplot(x=mergeDF.index, y="Close", data=mergeDF, order=2, ax=ax)
+sns.regplot(x=mergeDF.index,y="FEAR_GREED", data=mergeDF, order=2, ax=ax2)
+
+
+ax2.legend(handles=[a.lines[0] for a in [ax,ax2]], labels=["Close", "FEAR_GREED"])
+plt.show()
+
