@@ -48,7 +48,14 @@ for dtitem in dt:
     dateitem = dtitem.strftime('%Y%m%d')
     print(dateitem)
     url = f"https://web.archive.org/web/{dateitem}/https://money.cnn.com/data/fear-and-greed/"
-    page = requests.get(url, headers=h)
+    pageget=False
+    while not pageget:
+        try:
+            page = requests.get(url, headers=h)
+            if page.status_code == 200:
+                pageget=True
+        except:
+            pass
     soup = BeautifulSoup(page.content)
     fear_greed_index = int(soup.find_all(id="needleChart")[0].find('li').get_text().split(':')[1].split('(')[0])
     print(fear_greed_index)
@@ -64,7 +71,7 @@ Ticker='SPY'
 yDF = yf.download(Ticker, start= startdate.strftime('%Y-%m-%d') , end = enddate.strftime('%Y-%m-%d'))
 
 mergeDF=pd.merge(df , yDF ,  how='inner', left_index=True, right_index=True)
-
+mergeDF.to_csv(f'{Ticker}.csv')
 
 
 import matplotlib.pyplot as plt
@@ -79,17 +86,21 @@ fig = ax.get_figure()
 plt.show()
 
 
+
 ####################################################################################
 
 fig,ax = plt.subplots()
 
 ax.plot(mergeDF.Close, color="green", marker="o")
 ax.set_xlabel("Date",fontsize=14)
-ax.set_ylabel("Close",color="red",fontsize=14)
+ax.set_ylabel("Close",color="green",fontsize=14)
 fig = ax.get_figure()
+ax.set_title(f'{Ticker} vs. Market FEAR GREED indexing (CNN Money)')
 ax2=ax.twinx()
-ax2.plot(mergeDF.FEAR_GREED,color="blue",marker="o")
-ax2.set_ylabel("FEAR_GREED",color="blue",fontsize=14)
+ax2.plot(mergeDF.FEAR_GREED,color="red",marker="o")
+ax2.set_ylabel("FEAR_GREED",color="red",fontsize=14)
+ax.grid(True)
+ax2.grid(True)
 plt.show()
 
 
